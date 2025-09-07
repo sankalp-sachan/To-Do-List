@@ -23,6 +23,79 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+(function () {
+  // Flash message (optional feedback)
+  function flashMessage(text) {
+    var id = 'devblock-flash';
+    var el = document.getElementById(id);
+    if (!el) {
+      el = document.createElement('div');
+      el.id = id;
+      Object.assign(el.style, {
+        position: 'fixed',
+        right: '20px',
+        bottom: '20px',
+        background: '#000',
+        color: '#fff',
+        padding: '8px 12px',
+        borderRadius: '6px',
+        fontSize: '12px',
+        zIndex: 999999,
+        opacity: 0,
+        transition: 'opacity .2s'
+      });
+      document.body.appendChild(el);
+    }
+    el.textContent = text;
+    requestAnimationFrame(() => el.style.opacity = 1);
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.style.opacity = 0, 1200);
+  }
+
+  // Right click
+  document.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    flashMessage('Right-click disabled');
+  }, true);
+
+  // Keys to block
+  document.addEventListener('keydown', function (e) {
+    let k = e.key.toLowerCase();
+    let ctrl = e.ctrlKey || e.metaKey;
+
+    // F12
+    if (e.keyCode === 123) {
+      e.preventDefault(); flashMessage('F12 disabled');
+    }
+
+    // Ctrl+Shift+I/J/C/K
+    if (ctrl && e.shiftKey && ['i','j','c','k'].includes(k)) {
+      e.preventDefault(); flashMessage('DevTools blocked');
+    }
+
+    // Ctrl+U (view source), Ctrl+S (save)
+    if (ctrl && ['u','s'].includes(k)) {
+      e.preventDefault(); flashMessage('Action blocked');
+    }
+
+    // Ctrl+Shift+P (DevTools palette)
+    if (ctrl && e.shiftKey && k === 'p') {
+      e.preventDefault(); flashMessage('Blocked');
+    }
+  }, true);
+
+  // Detect DevTools (basic resize trick)
+  setInterval(() => {
+    if (window.outerWidth - window.innerWidth > 160 ||
+        window.outerHeight - window.innerHeight > 160) {
+      flashMessage('DevTools detected!');
+    }
+  }, 1000);
+})();
+</script>
+
 </body>
+
 
 </html>
